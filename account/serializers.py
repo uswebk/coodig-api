@@ -18,6 +18,9 @@ class AccountRegistrationSerializer(serializers.ModelSerializer):
         password2 = attrs.get('password2')
         if password != password2:
             raise serializers.ValidationError("Password and Confirm Password doesn't match")
+        if len(password) < 6:
+            raise serializers.ValidationError("Password six more")
+        return attrs
 
     def create(self, validate_data):
         return Account.objects.create_user(**validate_data)

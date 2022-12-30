@@ -7,14 +7,12 @@ from account.serializers import AccountRegistrationSerializer
 
 
 # Create your views here.
-class TestView(APIView):
-    permission_classes = [permissions.AllowAny, ]
-
-    def get(self, request):
-        return Response({'message': 'Request Success!'})
-
-    def post(self, request):
-        pass
+def get_tokens_for_user(user):
+    refresh = RefreshToken.for_user(user)
+    return {
+        'refresh': str(refresh),
+        'access': str(refresh.access_token),
+    }
 
 
 class RegistrationView(APIView):
@@ -26,11 +24,3 @@ class RegistrationView(APIView):
         user = serializer.save()
         token = get_tokens_for_user(user)
         return Response({'token': token}, status=status.HTTP_201_CREATED)
-
-
-def get_tokens_for_user(user):
-    refresh = RefreshToken.for_user(user)
-    return {
-        'refresh': str(refresh),
-        'access': str(refresh.access_token),
-    }
