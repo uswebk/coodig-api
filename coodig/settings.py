@@ -111,6 +111,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
+        'account.permissions.ActiveAccount'
     ],
 }
 
@@ -119,9 +120,6 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=20),  # Debug
     'REFRESH_TOKEN_LIFETIME': timedelta(days=365),
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
-    # "USER_AUTHENTICATION_RULE": (
-    #     "account.authenticate.authentication_rule"
-    # ),
 }
 
 # Internationalization
