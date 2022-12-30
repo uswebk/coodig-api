@@ -3,7 +3,7 @@ from django.db import models
 
 
 class AccountManager(BaseUserManager):
-    def create_user(self, email, name, password=None):
+    def create_user(self, email, name, password=None, password2=None):
         if not email:
             raise ValueError('User must have and email address')
         email = self.normalize_email(email)
