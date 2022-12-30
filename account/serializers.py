@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from account.models import Account
@@ -24,3 +25,9 @@ class AccountRegistrationSerializer(serializers.ModelSerializer):
 
     def create(self, validate_data):
         return Account.objects.create_user(**validate_data)
+
+
+class AccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Account
+        fields = ['id', 'name', 'email']
