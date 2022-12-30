@@ -30,3 +30,14 @@ class Account(AbstractBaseUser):
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['name']
+
+
+class Otp(models.Model):
+    class Meta:
+        db_table = 'account_otps'
+
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    code = models.CharField(max_length=6)
+    expiration_date = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)

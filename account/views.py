@@ -1,11 +1,15 @@
+import datetime
+import random
+
+from django.utils import timezone
 from rest_framework import permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 
-from account.models import Account
-from account.serializers import AccountRegistrationSerializer, AccountSerializer
+from account.models import Account, Otp
+from account.serializers import AccountRegistrationSerializer, AccountSerializer, OtpSerializer
 
 
 # Create your views here.
@@ -23,8 +27,15 @@ class RegistrationView(APIView):
     def post(self, request):
         serializer = AccountRegistrationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        token = get_tokens_for_user(user)
+        account = serializer.save()
+        token = get_tokens_for_user(account)
+        Otp.objects.create(
+            code=str(random.randrange(0, 999999)).zfill(6),
+            expiration_date=timezone.now() + datetime.timedelta(minutes=10),
+            account_id=account.id
+        )
+        # Otp Send Email
+
         return Response({'token': token}, status=status.HTTP_201_CREATED)
 
 

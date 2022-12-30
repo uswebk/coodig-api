@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from account.models import Account
+from account.models import Account, Otp
 
 
 class AccountRegistrationSerializer(serializers.ModelSerializer):
@@ -31,3 +31,11 @@ class AccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
         fields = ['id', 'name', 'email']
+
+
+class OtpSerializer(serializers.ModelSerializer):
+    account = AccountSerializer(read_only=True)
+
+    class Meta:
+        model = Otp
+        fields = '__all__'
