@@ -1,0 +1,2 @@
+class OtpVerifyError(Exception):
+    pass

@@ -10,6 +10,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from account.email import send_opt
+from account.exceptions import OtpVerifyError
 from account.models import Account, Otp
 from account.serializers import AccountRegistrationSerializer, AccountSerializer, VerifyAccountSerializer
 
@@ -51,18 +52,21 @@ class VerifyOtp(APIView):
                 email=email, email_verified_at__isnull=True).prefetch_related(
                 Prefetch('otp_set', queryset=Otp.objects.filter(expiration_date__gte=timezone.now()).all(),
                          to_attr="otps")).first()
-            if account is None:
-                return Response({"message": "invalid otp verify"}, status=status.HTTP_400_BAD_REQUEST)
-            otps = account.otps
-            if not otps:
-                return Response({"message": "invalid otp verify"}, status=status.HTTP_400_BAD_REQUEST)
-            otp_code = serializer.data['otp']
-            otp = otps[-1]
-            if otp.code != otp_code:
-                return Response({"message": "wrong otp code"}, status=status.HTTP_400_BAD_REQUEST)
-            account.email_verified_at = timezone.now()
-            account.save()
-            return Response({"message": "otp verify success"}, status=status.HTTP_200_OK)
+            try:
+                if account is None:
+                    raise OtpVerifyError('invalid otp verify')
+                otps = account.otps
+                if not otps:
+                    raise OtpVerifyError('invalid otp verify')
+                otp_code = serializer.data['otp']
+                otp = otps[-1]
+                if otp.code != otp_code:
+                    raise OtpVerifyError('wrong otp code')
+                account.email_verified_at = timezone.now()
+                account.save()
+                return Response({"message": "otp verify success"}, status=status.HTTP_200_OK)
+            except OtpVerifyError as e:
+                return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AccountView(ListAPIView):
