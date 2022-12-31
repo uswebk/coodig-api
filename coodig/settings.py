@@ -100,7 +100,7 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=20),  # Debug
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=120),  # Debug
     'REFRESH_TOKEN_LIFETIME': timedelta(days=365),
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
 }

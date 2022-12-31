@@ -1,3 +1,5 @@
+from abc import ABC
+
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
@@ -39,3 +41,8 @@ class OtpSerializer(serializers.ModelSerializer):
     class Meta:
         model = Otp
         fields = '__all__'
+
+
+class VerifyAccountSerializer(serializers.Serializer):  # noqa
+    email = serializers.EmailField()
+    otp = serializers.CharField()
