@@ -13,6 +13,7 @@ from account.email import send_opt
 from account.exceptions import OtpVerifyError
 from account.models import Account, Otp
 from account.serializers import AccountRegistrationSerializer, AccountSerializer, VerifyAccountSerializer
+from account.services import OtpService
 
 
 def get_tokens_for_user(user):
@@ -30,15 +31,11 @@ class RegistrationView(APIView):
         serializer = AccountRegistrationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         account = serializer.save()
-        token = get_tokens_for_user(account)
-        otp = Otp.objects.create(
-            code=str(random.randrange(0, 999999)).zfill(6),
-            expiration_date=timezone.now() + datetime.timedelta(minutes=10),
-            account_id=account.id
-        )
+        otp_service = OtpService(account)
+        otp = otp_service.create()
         send_opt(otp)
 
-        return Response({'token': token}, status=status.HTTP_201_CREATED)
+        return Response({'token': get_tokens_for_user(account)}, status=status.HTTP_201_CREATED)
 
 
 class VerifyOtp(APIView):
