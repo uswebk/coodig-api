@@ -1,6 +1,7 @@
 import datetime
 import random
 
+from django.db import transaction
 from django.db.models import Prefetch
 from django.utils import timezone
 from rest_framework import permissions, status
@@ -28,11 +29,12 @@ class RegistrationView(APIView):
     permission_classes = [permissions.AllowAny, ]
 
     def post(self, request):
-        serializer = AccountRegistrationSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        account = serializer.save()
-        otp_service = OtpService(account)
-        otp = otp_service.create()
+        with transaction.atomic():
+            serializer = AccountRegistrationSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            account = serializer.save()
+            otp_service = OtpService(account)
+            otp = otp_service.create()
         send_opt(otp)
 
         return Response({'token': get_tokens_for_user(account)}, status=status.HTTP_201_CREATED)
