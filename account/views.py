@@ -46,3 +46,15 @@ class VerifyOtp(APIView):
                 return Response({"message": "otp verify success"}, status=status.HTTP_200_OK)
             except OtpVerifyError as e:
                 return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class SendOtp(APIView):
+    permission_classes = [permissions.AllowAny, ]
+
+    def post(self, request):
+        account = self.request.user
+        otp_service = OtpService(account)
+        otp = otp_service.create()
+        send_opt(otp)
+
+        return Response({'message': 'Send otp success'}, status=status.HTTP_200_OK)
