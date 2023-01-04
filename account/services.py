@@ -43,6 +43,7 @@ def otp_verify(email: str, otp_code: str) -> bool:
     otp = otps[-1]
     if otp.code != otp_code:
         raise OtpVerifyError('wrong otp code')
+
     account.email_verified_at = timezone.now()
     account.save()
 
