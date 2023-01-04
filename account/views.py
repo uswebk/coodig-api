@@ -1,3 +1,4 @@
+from django.contrib.auth import authenticate
 from django.db import transaction
 from rest_framework import permissions, status
 from rest_framework.response import Response
@@ -6,7 +7,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from account.email import send_opt
 from account.exceptions import OtpVerifyError
-from account.serializers import AccountRegistrationSerializer, VerifyAccountSerializer
+from account.serializers import AccountRegistrationSerializer, VerifyAccountSerializer, UserLoginSerializer
 from account.services import OtpService, otp_verify
 
 
@@ -32,6 +33,24 @@ class RegistrationView(APIView):
             send_opt(otp)
 
         return Response({'token': get_tokens_for_user(account)}, status=status.HTTP_201_CREATED)
+
+
+class UserLoginView(APIView):
+    permission_classes = [permissions.AllowAny, ]
+    serializer_class = UserLoginSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.data.get('email')
+        password = serializer.data.get('password')
+        account = authenticate(email=email, password=password)
+        if account is not None:
+            token = get_tokens_for_user(account)
+            return Response({'token': token, 'message': 'Login Success'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'errors': {'non_field_errors': ['Email or Password is not Valid']}},
+                            status=status.HTTP_404_NOT_FOUND)
 
 
 class VerifyOtp(APIView):

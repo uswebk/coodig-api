@@ -1,6 +1,3 @@
-from abc import ABC
-
-from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from account.models import Account, Otp
@@ -27,6 +24,14 @@ class AccountRegistrationSerializer(serializers.ModelSerializer):
 
     def create(self, validate_data):
         return Account.objects.create_user(**validate_data)
+
+
+class UserLoginSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(max_length=255)
+
+    class Meta:
+        model = Account
+        fields = ['email', 'password']
 
 
 class AccountSerializer(serializers.ModelSerializer):
