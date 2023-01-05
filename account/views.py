@@ -32,9 +32,7 @@ class UserLoginView(APIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         try:
-            email = serializer.data.get('email')
-            password = serializer.data.get('password')
-            login_service = LoginService(email, password)
+            login_service = LoginService(serializer.data['email'], serializer.data['password'])
             token = login_service.login()
             return Response({'token': token, 'message': 'Login Success'}, status=status.HTTP_200_OK)
         except LoginError as e:
@@ -64,5 +62,4 @@ class SendOtp(APIView):
         otp_service = OtpService(account)
         otp = otp_service.create()
         send_opt(otp)
-
         return Response({'message': 'Send otp success'}, status=status.HTTP_200_OK)
