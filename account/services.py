@@ -1,12 +1,29 @@
 import datetime
 import random
 
+from django.contrib.auth import authenticate
 from django.db.models import Prefetch
 from django.utils import timezone
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from account.consts import OTP_VALID_MINUTES, OTP_CODE_NUMBER_OF_DIGITS
-from account.exceptions import OtpVerifyError
+from account.exceptions import OtpVerifyError, LoginError
 from account.models import Otp, Account
+
+
+class LoginService:
+    def __init__(self, email: str, password: str):
+        self.email = email
+        self.password = password
+
+    def login(self) -> dict:
+        account = authenticate(email=self.email, password=self.password)
+        if account is not None:
+            account.last_login = timezone.now()
+            account.save()
+            return get_tokens_for_user(account)
+        else:
+            raise LoginError()
 
 
 class OtpService:
@@ -48,3 +65,11 @@ def otp_verify(email: str, otp_code: str) -> bool:
     account.save()
 
     return True
+
+
+def get_tokens_for_user(user):
+    refresh = RefreshToken.for_user(user)
+    return {
+        'refresh': str(refresh),
+        'access': str(refresh.access_token),
+    }

@@ -1,22 +1,12 @@
-from django.contrib.auth import authenticate
 from django.db import transaction
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
 
-from account.email import send_opt
-from account.exceptions import OtpVerifyError
+from account.emails import send_opt
+from account.exceptions import OtpVerifyError, LoginError
 from account.serializers import AccountRegistrationSerializer, VerifyAccountSerializer, UserLoginSerializer
-from account.services import OtpService, otp_verify
-
-
-def get_tokens_for_user(user):
-    refresh = RefreshToken.for_user(user)
-    return {
-        'refresh': str(refresh),
-        'access': str(refresh.access_token),
-    }
+from account.services import LoginService, OtpService, otp_verify, get_tokens_for_user
 
 
 class RegistrationView(APIView):
@@ -31,7 +21,6 @@ class RegistrationView(APIView):
             otp_service = OtpService(account)
             otp = otp_service.create()
             send_opt(otp)
-
         return Response({'token': get_tokens_for_user(account)}, status=status.HTTP_201_CREATED)
 
 
@@ -42,13 +31,13 @@ class UserLoginView(APIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        email = serializer.data.get('email')
-        password = serializer.data.get('password')
-        account = authenticate(email=email, password=password)
-        if account is not None:
-            token = get_tokens_for_user(account)
+        try:
+            email = serializer.data.get('email')
+            password = serializer.data.get('password')
+            login_service = LoginService(email, password)
+            token = login_service.login()
             return Response({'token': token, 'message': 'Login Success'}, status=status.HTTP_200_OK)
-        else:
+        except LoginError as e:
             return Response({'errors': {'non_field_errors': ['Email or Password is not Valid']}},
                             status=status.HTTP_404_NOT_FOUND)
 
