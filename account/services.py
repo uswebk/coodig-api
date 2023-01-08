@@ -51,10 +51,7 @@ class OtpService:
 
 class OtpVerifyService:
     def __init__(self, email: str):
-        self.account = Account.objects.filter(
-            email=email, email_verified_at__isnull=True).prefetch_related(
-            Prefetch('otp_set', queryset=Otp.objects.filter(expiration_date__gte=timezone.now()).all(),
-                     to_attr="otps")).first()
+        self.account = self.get_account_with_active_otp_by_email(email)
 
     def get_account(self):
         return self.account
@@ -62,6 +59,13 @@ class OtpVerifyService:
     def otp_verify_done(self) -> None:
         self.account.email_verified_at = timezone.now()
         self.account.save()
+
+    @staticmethod
+    def get_account_with_active_otp_by_email(email: str):
+        return Account.objects.filter(
+            email=email, email_verified_at__isnull=True).prefetch_related(
+            Prefetch('otp_set', queryset=Otp.objects.filter(expiration_date__gte=timezone.now()).all(),
+                     to_attr="otps")).first()
 
 
 def get_tokens_for_user(user) -> dict:
