@@ -32,7 +32,7 @@ class QuizChoice(models.Model):
     class Meta:
         db_table = 'quiz_choices'
 
-    quiz_id = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    quiz_id = models.ForeignKey(Quiz, related_name='choices', on_delete=models.CASCADE)
     sentence = models.TextField()
     is_answer = models.BooleanField(default=False)
     sort = models.IntegerField()
