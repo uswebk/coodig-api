@@ -40,7 +40,7 @@ class UserLoginView(APIView):
                             status=status.HTTP_404_NOT_FOUND)
 
 
-class VerifyOtp(APIView):
+class VerifyOtpView(APIView):
     permission_classes = [permissions.IsAuthenticated, ]
     serializer_class = VerifyAccountSerializer
 
@@ -61,7 +61,7 @@ class VerifyOtp(APIView):
                 return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class SendOtp(APIView):
+class SendOtpView(APIView):
     permission_classes = [permissions.AllowAny, ]
 
     def post(self, request):
