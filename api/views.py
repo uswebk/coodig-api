@@ -1,5 +1,3 @@
-from rest_framework.generics import ListCreateAPIView
+from django.shortcuts import render
 
-
-class TagListView(ListCreateAPIView):
-    pass
+# Create your views here.
