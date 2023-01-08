@@ -1,7 +1,4 @@
-from rest_framework import permissions
-from rest_framework.generics import ListCreateAPIView
-from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 
 from quiz.models import Tag, Quiz
 from quiz.serializers import TagSerializer, QuizSerializer
