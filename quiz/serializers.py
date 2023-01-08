@@ -22,24 +22,29 @@ class QuizSerializer(serializers.ModelSerializer):
         return QuizChoiceSerializer(QuizChoice.objects.all().filter(quiz_id=obj.id), many=True).data
 
     def validate(self, attrs):
-        result = dict()
+        # TODO: Validation
         attrs['created_by'] = self.context['request'].user
-        result['quiz'] = attrs
-        result['choices'] = self.context['request'].data['choices']
-
-        return result
+        return attrs
 
     def create(self, validate_data):
-        quiz = Quiz.objects.create(**validate_data['quiz'])
-        for choice in validate_data['choices']:
+        quiz = Quiz.objects.create(**validate_data)
+        self.create_choices(quiz)
+        return quiz
+
+    def create_choices(self, quiz):
+        choices = self.context['request'].data['choices']
+        for choice in choices:
             choice['quiz_id'] = quiz.id
             quiz_choice_serializer = QuizChoiceSerializer(data=choice)
             quiz_choice_serializer.is_valid(raise_exception=True)
             quiz_choice_serializer.save()
-        return quiz
 
 
 class QuizChoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuizChoice
         fields = '__all__'
+
+    def validate(self, attrs):
+        # TODO: Validation
+        return attrs
