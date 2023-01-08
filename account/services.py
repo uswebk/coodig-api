@@ -49,27 +49,22 @@ class OtpService:
         return int(digits)
 
 
-def otp_verify(email: str, otp_code: str) -> bool:
-    account = Account.objects.filter(
-        email=email, email_verified_at__isnull=True).prefetch_related(
-        Prefetch('otp_set', queryset=Otp.objects.filter(expiration_date__gte=timezone.now()).all(),
-                 to_attr="otps")).first()
-    if account is None:
-        raise OtpVerifyError('invalid otp verify')
-    otps = account.otps
-    if not otps:
-        raise OtpVerifyError('invalid otp verify')
-    otp = otps[-1]
-    if otp.code != otp_code:
-        raise OtpVerifyError('wrong otp code')
+class OtpVerifyService:
+    def __init__(self, email: str):
+        self.account = Account.objects.filter(
+            email=email, email_verified_at__isnull=True).prefetch_related(
+            Prefetch('otp_set', queryset=Otp.objects.filter(expiration_date__gte=timezone.now()).all(),
+                     to_attr="otps")).first()
 
-    account.email_verified_at = timezone.now()
-    account.save()
+    def get_otp_by_email(self):
+        return self.account
 
-    return True
+    def otp_verify_done(self) -> None:
+        self.account.email_verified_at = timezone.now()
+        self.account.save()
 
 
-def get_tokens_for_user(user):
+def get_tokens_for_user(user) -> dict:
     refresh = RefreshToken.for_user(user)
     return {
         'refresh': str(refresh),

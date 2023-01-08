@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from account.emails import send_opt
 from account.exceptions import OtpVerifyError, LoginError
 from account.serializers import AccountRegistrationSerializer, VerifyAccountSerializer, UserLoginSerializer
-from account.services import LoginService, OtpService, otp_verify, get_tokens_for_user
+from account.services import LoginService, OtpService, OtpVerifyService, get_tokens_for_user
 
 
 class RegistrationView(APIView):
@@ -48,7 +48,14 @@ class VerifyOtp(APIView):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid(raise_exception=True):
             try:
-                otp_verify(serializer.data['email'], serializer.data['otp'])
+                otp_verify_service = OtpVerifyService(serializer.data['email'])
+                account = otp_verify_service.get_otp_by_email()
+                if account is None or not account.otps:
+                    raise OtpVerifyError('invalid otp verify')
+                otp = account.otps[-1]
+                if otp.code != serializer.data['otp']:
+                    raise OtpVerifyError('wrong otp code')
+                otp_verify_service.otp_verify_done()
                 return Response({"message": "otp verify success"}, status=status.HTTP_200_OK)
             except OtpVerifyError as e:
                 return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
