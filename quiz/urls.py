@@ -1,12 +1,12 @@
 from django.urls import path, include
 from rest_framework import routers
 
-from .views import TagListView, QuizViewSet
+from .views import TagViewSet, QuizReadOnlyViewSet
 
 router = routers.DefaultRouter()
-router.register('', QuizViewSet, basename='quizzes')
+router.register('tags', TagViewSet, basename='tags')
+router.register('', QuizReadOnlyViewSet, basename='quizzes')
 
 urlpatterns = [
-    path('tags/', TagListView.as_view(), name='tag_list'),
     path('', include(router.urls)),
 ]
