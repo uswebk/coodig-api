@@ -56,7 +56,7 @@ class OtpVerifyService:
             Prefetch('otp_set', queryset=Otp.objects.filter(expiration_date__gte=timezone.now()).all(),
                      to_attr="otps")).first()
 
-    def get_otp_by_email(self):
+    def get_account(self):
         return self.account
 
     def otp_verify_done(self) -> None:

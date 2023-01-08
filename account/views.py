@@ -49,7 +49,7 @@ class VerifyOtp(APIView):
         if serializer.is_valid(raise_exception=True):
             try:
                 otp_verify_service = OtpVerifyService(serializer.data['email'])
-                account = otp_verify_service.get_otp_by_email()
+                account = otp_verify_service.get_account()
                 if account is None or not account.otps:
                     raise OtpVerifyError('invalid otp verify')
                 otp = account.otps[-1]
