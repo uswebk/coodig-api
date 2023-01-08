@@ -3,6 +3,18 @@ from django.db import models
 from account.models import Account
 
 
+class Quiz(models.Model):
+    class Meta:
+        db_table = 'quizzes'
+
+    created_by = models.ForeignKey(Account, db_column='created_by', on_delete=models.CASCADE)
+    question = models.TextField()
+    is_published = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
 class Tag(models.Model):
     class Meta:
         db_table = 'tags'
