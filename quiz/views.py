@@ -9,7 +9,7 @@ class TagViewSet(ModelViewSet):
     serializer_class = TagSerializer
 
 
-class QuizReadOnlyViewSet(ModelViewSet):
+class QuizViewSet(ModelViewSet):
     serializer_class = QuizSerializer
 
     def get_queryset(self):
