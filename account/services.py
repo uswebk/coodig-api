@@ -7,7 +7,7 @@ from django.utils import timezone
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from account.consts import OTP_VALID_MINUTES, OTP_CODE_NUMBER_OF_DIGITS
-from account.exceptions import OtpVerifyError, LoginError
+from account.exceptions import LoginError
 from account.models import Otp, Account
 
 
