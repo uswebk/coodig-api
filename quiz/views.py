@@ -21,7 +21,7 @@ class QuizViewSet(ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         with transaction.atomic():
-            quiz_serializer = QuizSerializer(data=request.data['quiz'])
+            quiz_serializer = self.get_serializer(data=request.data['quiz'])
             quiz_serializer.is_valid(raise_exception=True)
             quiz = quiz_serializer.save()
 
