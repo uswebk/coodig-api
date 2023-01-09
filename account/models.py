@@ -16,9 +16,6 @@ class AccountManager(BaseUserManager):
 
 
 class Account(AbstractBaseUser):
-    class Meta:
-        db_table = 'accounts'
-
     email = models.EmailField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
     email_verified_at = models.DateTimeField(null=True, )
@@ -31,13 +28,16 @@ class Account(AbstractBaseUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['name']
 
+    class Meta:
+        db_table = 'accounts'
+
 
 class Otp(models.Model):
-    class Meta:
-        db_table = 'account_otps'
-
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     code = models.CharField(max_length=6)
     expiration_date = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'account_otps'
