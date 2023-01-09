@@ -11,6 +11,9 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class QuizSerializer(serializers.ModelSerializer):
+    question = serializers.CharField()
+    is_published = serializers.BooleanField()
+    is_deleted = serializers.BooleanField()
     choices = SerializerMethodField()
 
     class Meta:
@@ -21,16 +24,12 @@ class QuizSerializer(serializers.ModelSerializer):
     def get_choices(obj):
         return QuizChoiceSerializer(QuizChoice.objects.all().filter(quiz_id=obj.id), many=True).data
 
-    def validate(self, attrs):
-        # TODO: Validation
-        return attrs
-
 
 class QuizChoiceSerializer(serializers.ModelSerializer):
+    sentence = serializers.CharField()
+    is_answer = serializers.BooleanField()
+    sort = serializers.IntegerField()
+
     class Meta:
         model = QuizChoice
         fields = '__all__'
-
-    def validate(self, attrs):
-        # TODO: Validation
-        return attrs
