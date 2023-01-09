@@ -28,9 +28,9 @@ class QuizViewSet(ModelViewSet):
             choices = request.data['quiz']['choices']
             for choice in choices:
                 choice['quiz_id'] = quiz.id
-                quiz_choice_serializer = QuizChoiceSerializer(data=choice)
-                quiz_choice_serializer.is_valid(raise_exception=True)
-                quiz_choice_serializer.save()
+            quiz_choice_serializer = QuizChoiceSerializer(data=choices, many=True)
+            quiz_choice_serializer.is_valid(raise_exception=True)
+            quiz_choice_serializer.save()
 
             tags = request.data['tags']
             for _tag in tags:
