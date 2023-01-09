@@ -62,7 +62,6 @@ class VerifyOtpView(APIView):
 
 
 class SendOtpView(APIView):
-    permission_classes = [permissions.AllowAny, ]
 
     def post(self, request):
         account = self.request.user
