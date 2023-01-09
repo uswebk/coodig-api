@@ -21,16 +21,19 @@ class QuizViewSet(ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         with transaction.atomic():
-            quiz_serializer = QuizSerializer(data=request.data)
+            quiz_serializer = QuizSerializer(data=request.data['quiz'])
             quiz_serializer.is_valid(raise_exception=True)
             quiz = quiz_serializer.save()
 
-            choices = request.data['choices']
+            choices = request.data['quiz']['choices']
             for choice in choices:
                 choice['quiz_id'] = quiz.id
                 quiz_choice_serializer = QuizChoiceSerializer(data=choice)
                 quiz_choice_serializer.is_valid(raise_exception=True)
                 quiz_choice_serializer.save()
 
-            # TODO: create tag
+            tags = request.data['tags']
+            for _tag in tags:
+                tag = Tag.objects.get_or_create(name=_tag['name'], defaults={'created_by': request.user})
+                quiz.tags.add(tag[0])
         return Response(quiz_serializer.data, status=status.HTTP_201_CREATED)
