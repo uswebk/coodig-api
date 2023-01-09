@@ -1,7 +1,10 @@
+from django.db import transaction
+from rest_framework import status
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from quiz.models import Tag, Quiz
-from quiz.serializers import TagSerializer, QuizSerializer
+from quiz.serializers import TagSerializer, QuizSerializer, QuizChoiceSerializer
 
 
 class TagViewSet(ModelViewSet):
@@ -15,3 +18,19 @@ class QuizViewSet(ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         return Quiz.objects.filter(created_by=user).prefetch_related('choices')
+
+    def create(self, request, *args, **kwargs):
+        with transaction.atomic():
+            quiz_serializer = QuizSerializer(data=request.data)
+            quiz_serializer.is_valid(raise_exception=True)
+            quiz = quiz_serializer.save()
+
+            choices = request.data['choices']
+            for choice in choices:
+                choice['quiz_id'] = quiz.id
+                quiz_choice_serializer = QuizChoiceSerializer(data=choice)
+                quiz_choice_serializer.is_valid(raise_exception=True)
+                quiz_choice_serializer.save()
+
+            # TODO: create tag
+        return Response(quiz_serializer.data, status=status.HTTP_201_CREATED)
