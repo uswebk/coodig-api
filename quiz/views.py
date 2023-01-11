@@ -1,5 +1,6 @@
 from django.db import transaction
 from rest_framework import status
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
@@ -37,3 +38,8 @@ class QuizViewSet(ModelViewSet):
                 tag = Tag.objects.get_or_create(name=_tag['name'], defaults={'created_by': request.user})
                 quiz.tags.add(tag[0])
         return Response(quiz_serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(methods=['POST'], detail=True)
+    def answer(self, request, pk=None):
+        # TODO answer done
+        return Response({"message": "answer"}, status=status.HTTP_200_OK)
