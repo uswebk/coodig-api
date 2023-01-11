@@ -1,11 +1,12 @@
 from django.db import transaction
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from quiz.models import Tag, Quiz
-from quiz.serializers import TagSerializer, QuizSerializer, QuizChoiceSerializer
+from quiz.serializers import TagSerializer, QuizSerializer, QuizChoiceSerializer, QuizAnswerSerializer
 
 
 class TagViewSet(ModelViewSet):
@@ -41,5 +42,19 @@ class QuizViewSet(ModelViewSet):
 
     @action(methods=['POST'], detail=True)
     def answer(self, request, pk=None):
-        # TODO answer done
-        return Response({"message": "answer"}, status=status.HTTP_200_OK)
+        quiz = get_object_or_404(Quiz, pk=pk)
+        account = self.request.user
+        answer = {
+            'account_id': account.id,
+            'quiz_id': quiz.id,
+            'question': quiz.question,
+            'is_correct': request.data['is_correct'],
+        }
+
+        serializer = QuizAnswerSerializer(data=answer)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        # TODO: create choices logs
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
-from quiz.models import Tag, Quiz, QuizChoice, QuizTag
+from quiz.models import Tag, Quiz, QuizChoice, QuizTag, QuizAnswer
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -39,4 +39,10 @@ class QuizChoiceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = QuizChoice
+        fields = '__all__'
+
+
+class QuizAnswerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuizAnswer
         fields = '__all__'
