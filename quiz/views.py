@@ -7,6 +7,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from quiz.models import Tag, Quiz
 from quiz.serializers import TagSerializer, QuizSerializer, QuizChoiceSerializer, QuizAnswerSerializer
+from quiz.services import AnswerService
 
 
 class TagViewSet(ModelViewSet):
@@ -43,18 +44,9 @@ class QuizViewSet(ModelViewSet):
     @action(methods=['POST'], detail=True)
     def answer(self, request, pk=None):
         quiz = get_object_or_404(Quiz, pk=pk)
-        account = self.request.user
-        answer = {
-            'account_id': account.id,
-            'quiz_id': quiz.id,
-            'question': quiz.question,
-            'is_correct': request.data['is_correct'],
-        }
-
-        serializer = QuizAnswerSerializer(data=answer)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        answer_service = AnswerService(quiz, self.request.user)
+        answer_serializer = answer_service.create_answer(request.data['is_correct'])
 
         # TODO: create choices logs
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(answer_serializer.data, status=status.HTTP_201_CREATED)
