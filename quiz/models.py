@@ -47,6 +47,7 @@ class QuizTag(models.Model):
 
     class Meta:
         db_table = 'quizzes_tags'
+        auto_created = True
 
 
 class QuizAnswer(models.Model):
