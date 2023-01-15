@@ -37,6 +37,12 @@ class QuizViewSet(ModelViewSet):
 
         return Response(quiz_serializer.data, status=status.HTTP_201_CREATED)
 
+    def destroy(self, request, *args, pk=None):
+        quiz = get_object_or_404(Quiz, pk=pk, created_by=self.request.user, is_deleted=False)
+        quiz.is_deleted = True
+        quiz.save()
+        return Response({}, status=status.HTTP_200_OK)
+
     @action(methods=['POST'], detail=True)
     def answer(self, request, pk=None):
         quiz = get_object_or_404(Quiz, pk=pk)
