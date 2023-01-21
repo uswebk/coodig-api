@@ -1,5 +1,5 @@
 from account.models import Account
-from quiz.models import Quiz, Tag
+from quiz.models import Quiz, Tag, QuizAnswerChoice
 from quiz.serializers import QuizAnswerSerializer, QuizChoiceSerializer
 
 
@@ -37,3 +37,20 @@ class AnswerService:
         serializer.save()
 
         return serializer
+
+    @staticmethod
+    def create_answer_choices(quiz: Quiz, choices: list) -> list:
+        quiz_choices = quiz.choices.all()
+        answer = quiz.answer_quiz.first()
+
+        payload = []
+        for choice in quiz_choices:
+            is_select = choice.sort in choices
+            payload.append(QuizAnswerChoice(
+                answer_id=answer,
+                choice=choice.sentence,
+                is_answer=choice.is_answer,
+                is_select=is_select,
+            ))
+
+        return QuizAnswerChoice.objects.bulk_create(payload)

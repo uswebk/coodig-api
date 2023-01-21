@@ -45,10 +45,9 @@ class QuizViewSet(ModelViewSet):
 
     @action(methods=['POST'], detail=True)
     def answer(self, request, pk=None):
-        quiz = get_object_or_404(Quiz, pk=pk)
+        quiz = get_object_or_404(Quiz.objects.prefetch_related('choices'), pk=pk)
         answer_service = AnswerService(quiz, self.request.user)
         answer_serializer = answer_service.create_answer(request.data['is_correct'])
-
-        # TODO: create choices logs
+        answer_service.create_answer_choices(quiz, request.data['choices'])
 
         return Response(answer_serializer.data, status=status.HTTP_201_CREATED)
