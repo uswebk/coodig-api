@@ -28,7 +28,7 @@ class Quiz(models.Model):
 
 
 class QuizChoice(models.Model):
-    quiz_id = models.ForeignKey(Quiz, related_name='choices', on_delete=models.CASCADE)
+    quiz_id = models.ForeignKey(Quiz, related_name='choices', db_column='quiz_id', on_delete=models.CASCADE)
     sentence = models.TextField()
     is_answer = models.BooleanField(default=False)
     sort = models.IntegerField()
@@ -47,7 +47,6 @@ class QuizTag(models.Model):
 
     class Meta:
         db_table = 'quizzes_tags'
-        auto_created = True
 
 
 class QuizAnswer(models.Model):
@@ -64,7 +63,7 @@ class QuizAnswer(models.Model):
 
 
 class QuizAnswerChoice(models.Model):
-    answer_id = models.ForeignKey(QuizAnswer, related_name='answer', db_column='answer_id',
+    answer_id = models.ForeignKey(QuizAnswer, related_name='answer_choices', db_column='answer_id',
                                   on_delete=models.CASCADE)
     choice = models.TextField()
     is_answer = models.BooleanField(default=False)
