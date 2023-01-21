@@ -61,3 +61,16 @@ class QuizAnswer(models.Model):
 
     class Meta:
         db_table = 'quiz_answers'
+
+
+class QuizAnswerChoice(models.Model):
+    answer_id = models.ForeignKey(QuizAnswer, related_name='answer', db_column='answer_id',
+                                  on_delete=models.CASCADE)
+    choice = models.TextField()
+    is_answer = models.BooleanField(default=False)
+    is_select = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'quiz_answer_choices'
