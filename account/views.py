@@ -5,7 +5,8 @@ from rest_framework.views import APIView
 
 from account.emails import send_opt
 from account.exceptions import OtpVerifyError, LoginError
-from account.serializers import AccountRegistrationSerializer, VerifyAccountSerializer, UserLoginSerializer
+from account.serializers import AccountRegistrationSerializer, VerifyAccountSerializer, UserLoginSerializer, \
+    AccountSerializer
 from account.services import LoginService, OtpService, OtpVerifyService, get_tokens_for_user
 
 
@@ -69,3 +70,9 @@ class SendOtpView(APIView):
         otp = otp_service.create()
         send_opt(otp)
         return Response({'message': 'Send otp success'}, status=status.HTTP_200_OK)
+
+
+class MeView(APIView):
+    def get(self, request):
+        account = self.request.user
+        return Response(AccountSerializer(instance=account).data, status=status.HTTP_200_OK)
