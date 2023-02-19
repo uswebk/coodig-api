@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
-from quiz.models import Tag, Quiz, QuizChoice, QuizTag, QuizAnswer
+from quiz.models import Tag, Quiz, QuizChoice, QuizTag, QuizAnswer, QuizAnswerChoice
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -43,6 +43,18 @@ class QuizChoiceSerializer(serializers.ModelSerializer):
 
 
 class QuizAnswerSerializer(serializers.ModelSerializer):
+    answer_choices = SerializerMethodField()
+
     class Meta:
         model = QuizAnswer
+        fields = '__all__'
+
+    @staticmethod
+    def get_answer_choices(obj):
+        return QuizAnswerChoiceSerializer(QuizAnswerChoice.objects.filter(answer_id=obj.id).all(), many=True).data
+
+
+class QuizAnswerChoiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuizAnswerChoice
         fields = '__all__'
