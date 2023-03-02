@@ -73,6 +73,8 @@ class SendOtpView(APIView):
 
 
 class MeView(APIView):
+    permission_classes = [permissions.IsAuthenticated, ]
+
     def get(self, request):
         account = self.request.user
         return Response(AccountSerializer(instance=account).data, status=status.HTTP_200_OK)
