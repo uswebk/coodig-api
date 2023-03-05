@@ -1,5 +1,7 @@
+from django.db.models import Count, Subquery, Exists, OuterRef
+
 from account.models import Account
-from quiz.models import Quiz, Tag, QuizAnswerChoice
+from quiz.models import Quiz, Tag, QuizAnswerChoice, QuizAnswer
 from quiz.serializers import QuizAnswerSerializer, QuizChoiceSerializer
 
 
@@ -54,3 +56,17 @@ class AnswerService:
             ))
 
         return QuizAnswerChoice.objects.bulk_create(payload)
+
+
+class RandomQuizServie:
+    @staticmethod
+    def get_random(account: Account):
+        subquery = Subquery(
+            QuizAnswer.objects.filter(quiz_id=OuterRef('pk')).filter(account_id=account.id).values('quiz_id')
+        )
+
+        return Quiz.objects.exclude(created_by=account).filter(is_published=True).annotate(
+            has_children=Exists(subquery)
+        ).filter(
+            has_children=False
+        ).first()

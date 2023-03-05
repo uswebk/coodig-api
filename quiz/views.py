@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.http import Http404
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
@@ -7,7 +8,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from quiz.models import Tag, Quiz
 from quiz.serializers import TagSerializer, QuizSerializer
-from quiz.services import AnswerService, QuizService
+from quiz.services import AnswerService, QuizService, RandomQuizServie
 
 
 class TagViewSet(ModelViewSet):
@@ -51,3 +52,11 @@ class QuizViewSet(ModelViewSet):
         answer_service.create_answer_choices(quiz, request.data['choices'])
 
         return Response(answer_serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(methods=['GET'], detail=False)
+    def random(self, request, pk=None):
+        quiz = RandomQuizServie().get_random(self.request.user)
+
+        if not quiz:
+            raise Http404
+        return Response(self.serializer_class(quiz).data, status=status.HTTP_200_OK)
