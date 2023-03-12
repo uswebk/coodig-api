@@ -47,16 +47,11 @@ class VerifyOtpView(APIView):
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
+        account = self.request.user
         if serializer.is_valid(raise_exception=True):
             try:
-                otp_verify_service = OtpVerifyService(serializer.data['email'])
-                account = otp_verify_service.get_account()
-                if account is None or not account.otps:
-                    raise OtpVerifyError('invalid otp verify')
-                otp = account.otps[-1]
-                if otp.code != serializer.data['otp']:
-                    raise OtpVerifyError('wrong otp code')
-                otp_verify_service.otp_verify_done()
+                otp_verify_service = OtpVerifyService(account)
+                otp_verify_service.done(serializer.data['otp'])
                 return Response({"message": "otp verify success"}, status=status.HTTP_200_OK)
             except OtpVerifyError as e:
                 return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)

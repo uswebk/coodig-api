@@ -7,7 +7,7 @@ from django.utils import timezone
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from account.consts import OTP_VALID_MINUTES, OTP_CODE_NUMBER_OF_DIGITS
-from account.exceptions import LoginError
+from account.exceptions import LoginError, OtpVerifyError
 from account.models import Otp, Account
 
 
@@ -50,22 +50,22 @@ class OtpService:
 
 
 class OtpVerifyService:
-    def __init__(self, email: str):
-        self.account = self.get_account_with_active_otp_by_email(email)
+    def __init__(self, account: Account):
+        self.account = account
 
-    def get_account(self):
-        return self.account
+    def done(self, send_code: str):
+        if not self.account.otps:
+            raise OtpVerifyError('invalid otp verify')
+        otp = self.account.otps.last()
+        if send_code != otp.code:
+            raise OtpVerifyError('wrong otp code')
+        if timezone.now() > otp.expiration_date:
+            raise OtpVerifyError('expiration of validity')
+        self.otp_verify_done()
 
     def otp_verify_done(self) -> None:
         self.account.email_verified_at = timezone.now()
         self.account.save()
-
-    @staticmethod
-    def get_account_with_active_otp_by_email(email: str):
-        return Account.objects.filter(
-            email=email, email_verified_at__isnull=True).prefetch_related(
-            Prefetch('otp_set', queryset=Otp.objects.filter(expiration_date__gte=timezone.now()).all(),
-                     to_attr="otps")).first()
 
 
 def get_tokens_for_user(user) -> dict:

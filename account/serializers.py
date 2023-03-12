@@ -49,5 +49,4 @@ class OtpSerializer(serializers.ModelSerializer):
 
 
 class VerifyAccountSerializer(serializers.Serializer):  # noqa
-    email = serializers.EmailField()
     otp = serializers.CharField()

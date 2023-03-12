@@ -33,7 +33,7 @@ class Account(AbstractBaseUser):
 
 
 class Otp(models.Model):
-    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='otps')
     code = models.CharField(max_length=6)
     expiration_date = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
