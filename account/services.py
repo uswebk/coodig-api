@@ -37,7 +37,7 @@ class OtpService:
         digits = self.__get_digits()
         otp = Otp.objects.create(
             code=str(random.randrange(0, digits)).zfill(self.number_of_digits),
-            expiration_date=timezone.now() + datetime.timedelta(minutes=OTP_VALID_MINUTES),
+            expiration_at=timezone.now() + datetime.timedelta(minutes=OTP_VALID_MINUTES),
             account_id=self.account.id
         )
         return otp
@@ -55,15 +55,15 @@ class OtpVerifyService:
 
     def done(self, send_code: str):
         if not self.account.otps:
-            raise OtpVerifyError('invalid otp verify')
+            raise OtpVerifyError('Invalid otp verify')
         otp = self.account.otps.last()
         if send_code != otp.code:
-            raise OtpVerifyError('wrong otp code')
-        if timezone.now() > otp.expiration_date:
-            raise OtpVerifyError('expiration of validity')
-        self.otp_verify_done()
+            raise OtpVerifyError('Wrong otp code')
+        if timezone.now() > otp.expiration_at:
+            raise OtpVerifyError('Expiration of validity')
+        self.verify_done()
 
-    def otp_verify_done(self) -> None:
+    def verify_done(self) -> None:
         self.account.email_verified_at = timezone.now()
         self.account.save()
 

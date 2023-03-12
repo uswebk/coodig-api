@@ -5,7 +5,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('quiz', '0002_quiz'),
     ]
@@ -15,10 +14,13 @@ class Migration(migrations.Migration):
             name='QuizTag',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('quiz_id', models.ForeignKey(db_column='quiz_id', on_delete=django.db.models.deletion.CASCADE,
+                                              related_name='quiz', to='quiz.quiz')),
+                ('tag_id',
+                 models.ForeignKey(db_column='tag_id', on_delete=django.db.models.deletion.CASCADE, related_name='tag',
+                                   to='quiz.tag')),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('quiz_id', models.ForeignKey(db_column='quiz_id', on_delete=django.db.models.deletion.CASCADE, related_name='quiz', to='quiz.quiz')),
-                ('tag_id', models.ForeignKey(db_column='tag_id', on_delete=django.db.models.deletion.CASCADE, related_name='tag', to='quiz.tag')),
             ],
             options={
                 'db_table': 'quizzes_tags',

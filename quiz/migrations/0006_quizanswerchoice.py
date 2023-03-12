@@ -5,7 +5,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('quiz', '0005_quizanswer'),
     ]
@@ -15,12 +14,13 @@ class Migration(migrations.Migration):
             name='QuizAnswerChoice',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('answer_id', models.ForeignKey(db_column='answer_id', on_delete=django.db.models.deletion.CASCADE,
+                                                related_name='answer_choices', to='quiz.quizanswer')),
                 ('choice', models.TextField()),
                 ('is_answer', models.BooleanField(default=False)),
                 ('is_select', models.BooleanField(default=False)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('answer_id', models.ForeignKey(db_column='answer_id', on_delete=django.db.models.deletion.CASCADE, related_name='answer_choices', to='quiz.quizanswer')),
             ],
             options={
                 'db_table': 'quiz_answer_choices',
