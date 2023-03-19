@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 
 from account.emails import send_opt
 from account.exceptions import OtpVerifyError, LoginError
+from account.permissions import ActiveAccount
 from account.serializers import AccountRegistrationSerializer, VerifyAccountSerializer, UserLoginSerializer, \
     AccountSerializer
 from account.services import LoginService, OtpService, OtpVerifyService, get_tokens_for_user
@@ -42,7 +43,7 @@ class UserLoginView(APIView):
 
 
 class VerifyOtpView(APIView):
-    permission_classes = [permissions.IsAuthenticated, ]
+    permission_classes = [permissions.IsAuthenticated, ActiveAccount]
     serializer_class = VerifyAccountSerializer
 
     def post(self, request):
@@ -68,7 +69,7 @@ class SendOtpView(APIView):
 
 
 class MeView(APIView):
-    permission_classes = [permissions.IsAuthenticated, ]
+    permission_classes = [permissions.IsAuthenticated, ActiveAccount]
 
     def get(self, request):
         account = self.request.user

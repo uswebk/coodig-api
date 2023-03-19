@@ -98,13 +98,14 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
-        'account.permissions.ActiveAccount'
+        'account.permissions.ActiveAccount',
+        'account.permissions.VerifiedAccount'
     ],
 }
 
 SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=120),  # Debug
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),  # Debug
     'REFRESH_TOKEN_LIFETIME': timedelta(days=365),
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
 }
