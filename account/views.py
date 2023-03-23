@@ -7,7 +7,7 @@ from account.emails import send_opt
 from account.exceptions import OtpVerifyError, LoginError
 from account.permissions import ActiveAccount
 from account.serializers import AccountRegistrationSerializer, VerifyAccountSerializer, UserLoginSerializer, \
-    AccountSerializer
+    AccountSerializer, OtpSerializer
 from account.services import LoginService, OtpService, OtpVerifyService, get_tokens_for_user
 
 
@@ -56,6 +56,19 @@ class VerifyOtpView(APIView):
                 return Response({"message": "otp verify success"}, status=status.HTTP_200_OK)
             except OtpVerifyError as e:
                 return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class OtpView(APIView):
+    permission_classes = [permissions.IsAuthenticated, ActiveAccount]
+    serializer_class = OtpSerializer
+
+    def get(self, request):
+        account = self.request.user
+        otps = account.otps
+        if otps is None:
+            return Response({'message': 'Not Found Otp'}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({'message': self.serializer_class(otps.last()).data}, status=status.HTTP_200_OK)
 
 
 class SendOtpView(APIView):
