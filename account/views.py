@@ -68,7 +68,7 @@ class OtpView(APIView):
         if otps is None:
             return Response({'message': 'Not Found Otp'}, status=status.HTTP_404_NOT_FOUND)
 
-        return Response({'message': self.serializer_class(otps.last()).data}, status=status.HTTP_200_OK)
+        return Response(self.serializer_class(otps.last()).data, status=status.HTTP_200_OK)
 
 
 class SendOtpView(APIView):
