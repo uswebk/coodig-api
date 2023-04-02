@@ -72,6 +72,7 @@ class OtpView(APIView):
 
 
 class SendOtpView(APIView):
+    permission_classes = [permissions.IsAuthenticated, ActiveAccount]
 
     def post(self, request):
         account = self.request.user
