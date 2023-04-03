@@ -88,3 +88,22 @@ class MeView(APIView):
     def get(self, request):
         account = self.request.user
         return Response(AccountSerializer(instance=account).data, status=status.HTTP_200_OK)
+
+
+class SendResetPasswordView(APIView):
+    permission_classes = [permissions.AllowAny, ]
+
+    def post(self, request):
+        # STEP1. request email serializer
+        # STEP2. user check
+        # STEP3.send mail
+        return Response({}, status=status.HTTP_200_OK)
+
+
+class ChangePasswordView(APIView):
+    permission_classes = [permissions.AllowAny, ]
+
+    def post(self, request):
+        # STEP1. request uid & token & password serializer
+        # STEP2. set password
+        return Response({}, status=status.HTTP_200_OK)

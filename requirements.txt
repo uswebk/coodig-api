@@ -15,10 +15,12 @@ djoser==2.1.0
 environ==1.0
 future==0.18.3
 idna==3.4
+intervaltree==3.1.0
 itypes==1.2.0
 Jinja2==3.1.2
 MarkupSafe==2.1.1
 mysqlclient==2.1.1
+networkx==3.0
 oauthlib==3.2.2
 pycparser==2.21
 PyJWT==2.6.0
@@ -30,6 +32,8 @@ serializers==0.2.4
 six==1.16.0
 social-auth-app-django==4.0.0
 social-auth-core==4.3.0
+sortedcontainers==2.4.0
 sqlparse==0.4.3
+tag==0.5
 uritemplate==4.1.1
 urllib3==1.26.13
