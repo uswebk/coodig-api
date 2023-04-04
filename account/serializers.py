@@ -50,3 +50,10 @@ class OtpSerializer(serializers.ModelSerializer):
 
 class VerifyAccountSerializer(serializers.Serializer):  # noqa
     otp = serializers.CharField()
+
+
+class SendPasswordResetEmailSerializer(serializers.Serializer):
+    email = serializers.EmailField(max_length=255)
+
+    class Meta:
+        fields = ['email']

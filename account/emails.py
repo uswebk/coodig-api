@@ -19,3 +19,10 @@ def send_opt(otp):
     to_email = otp.account.email
 
     send_mail(subject, body, [to_email])
+
+
+def send_reset_password(email: str, link: str):
+    subject = 'Reset Password'
+    body = 'Forget your password? To reset password click on the link: \n' + link
+
+    send_mail(subject, body, [email])

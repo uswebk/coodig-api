@@ -2,13 +2,17 @@ import datetime
 import random
 
 from django.contrib.auth import authenticate
-from django.db.models import Prefetch
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils import timezone
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from account.consts import OTP_VALID_MINUTES, OTP_CODE_NUMBER_OF_DIGITS
+from account.emails import send_reset_password
 from account.exceptions import LoginError, OtpVerifyError
 from account.models import Otp, Account
+from coodig import settings
 
 
 class LoginService:
@@ -74,3 +78,15 @@ def get_tokens_for_user(user) -> dict:
         'refresh': str(refresh),
         'access': str(refresh.access_token),
     }
+
+
+class SendResetPasswordService:
+    def __init__(self, account: Account):
+        self.account = account
+
+    def execute(self) -> None:
+        uid = urlsafe_base64_encode(force_bytes(self.account.id))
+        token = PasswordResetTokenGenerator().make_token(self.account)
+        link = settings.APP_SCHEMA + 'reset-password/' + uid + '/' + token
+
+        send_reset_password(self.account.email, link)

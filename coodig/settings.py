@@ -12,6 +12,8 @@ SECRET_KEY = env('SECRET_KEY')
 
 DEBUG = True
 
+APP_SCHEMA = 'dev.coodig://'
+
 ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [

@@ -1,14 +1,21 @@
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.db import transaction
+from django.utils.encoding import force_bytes
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from account.emails import send_opt
+from account.emails import send_opt, send_reset_password
 from account.exceptions import OtpVerifyError, LoginError
+from account.models import Account
 from account.permissions import ActiveAccount
 from account.serializers import AccountRegistrationSerializer, VerifyAccountSerializer, UserLoginSerializer, \
-    AccountSerializer, OtpSerializer
-from account.services import LoginService, OtpService, OtpVerifyService, get_tokens_for_user
+    AccountSerializer, OtpSerializer, SendPasswordResetEmailSerializer
+from account.services import LoginService, OtpService, OtpVerifyService, get_tokens_for_user, SendResetPasswordService
+
+from django.utils.http import urlsafe_base64_encode
+
+from coodig import settings
 
 
 class RegistrationView(APIView):
@@ -92,12 +99,18 @@ class MeView(APIView):
 
 class SendResetPasswordView(APIView):
     permission_classes = [permissions.AllowAny, ]
+    serializer_class = SendPasswordResetEmailSerializer
 
     def post(self, request):
-        # STEP1. request email serializer
-        # STEP2. user check
-        # STEP3.send mail
-        return Response({}, status=status.HTTP_200_OK)
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid(raise_exception=True):
+            account = Account.objects.filter(email=serializer.data['email']).first()
+            if account is None:
+                return Response({'message': 'Send Reset Password Mail Fail'}, status=status.HTTP_404_NOT_FOUND)
+            SendResetPasswordService(account).execute()
+
+            return Response({'message': 'Send Reset Password Mail'}, status=status.HTTP_200_OK)
 
 
 class ChangePasswordView(APIView):
