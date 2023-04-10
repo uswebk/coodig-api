@@ -1,21 +1,15 @@
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.db import transaction
-from django.utils.encoding import force_bytes
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from account.emails import send_opt, send_reset_password
+from account.emails import send_opt
 from account.exceptions import OtpVerifyError, LoginError
 from account.models import Account
 from account.permissions import ActiveAccount
-from account.serializers import AccountRegistrationSerializer, VerifyAccountSerializer, UserLoginSerializer, \
+from account.api.serializers import AccountRegistrationSerializer, VerifyAccountSerializer, UserLoginSerializer, \
     AccountSerializer, OtpSerializer, SendPasswordResetEmailSerializer
 from account.services import LoginService, OtpService, OtpVerifyService, get_tokens_for_user, SendResetPasswordService
-
-from django.utils.http import urlsafe_base64_encode
-
-from coodig import settings
 
 
 class RegistrationView(APIView):

@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
 urlpatterns = [
-    path('v1/accounts/', include('account.urls')),
+    path('v1/accounts/', include('account.api.urls')),
     path('v1/quizzes/', include('quiz.urls')),
 
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
