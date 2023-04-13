@@ -10,11 +10,12 @@ env.read_env('.env')
 
 SECRET_KEY = env('SECRET_KEY')
 
-DEBUG = True
+DEBUG = env('DEBUG')
 
-APP_SCHEMA = 'dev.coodig://'
+if env('DEBUG'):
+    APP_SCHEMA = 'dev.coodig://'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['10.0.2.2', '127.0.0.1', 'localhost']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
