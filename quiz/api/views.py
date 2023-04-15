@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from quiz.models import Tag, Quiz
-from quiz.serializers import TagSerializer, QuizSerializer
+from quiz.api.serializers import TagSerializer, QuizSerializer
 from quiz.services import AnswerService, QuizService, RandomQuizServie
 
 

@@ -2,7 +2,7 @@ from django.db.models import Count, Subquery, Exists, OuterRef
 
 from account.models import Account
 from quiz.models import Quiz, Tag, QuizAnswerChoice, QuizAnswer
-from quiz.serializers import QuizAnswerSerializer, QuizChoiceSerializer
+from quiz.api.serializers import QuizAnswerSerializer, QuizChoiceSerializer
 
 
 class QuizService:
