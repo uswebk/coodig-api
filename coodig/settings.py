@@ -9,6 +9,7 @@ env = environ.Env()
 env.read_env('.env')
 
 SECRET_KEY = env('SECRET_KEY')
+URI_SECRET_KEY = env('URI_SECRET_KEY')
 
 DEBUG = env('DEBUG')
 

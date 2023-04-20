@@ -1,4 +1,6 @@
 import datetime
+import hashlib
+import hmac
 import random
 
 from django.contrib.auth import authenticate
@@ -6,6 +8,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
+from django.utils.timezone import now, timedelta
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from account.consts import OTP_VALID_MINUTES, OTP_CODE_NUMBER_OF_DIGITS
@@ -89,4 +92,15 @@ class SendResetPasswordService:
         token = PasswordResetTokenGenerator().make_token(self.account)
         link = settings.APP_SCHEMA + 'reset-password/' + uid + '/' + token
 
-        send_reset_password(self.account.email, link)
+        expiration = now() + timedelta(hours=1)
+        payload = link + f':{expiration.timestamp()}'
+
+        signature = hmac.new(
+            key=settings.URI_SECRET_KEY.encode(),
+            msg=payload.encode(),
+            digestmod=hashlib.sha256
+        ).hexdigest()
+
+        url = f'{link}:{expiration.timestamp()}:{signature}'
+
+        send_reset_password(self.account.email, url)
