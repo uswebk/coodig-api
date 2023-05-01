@@ -54,9 +54,9 @@ class VerifyOtpView(APIView):
             try:
                 otp_verify_service = OtpVerifyService(account)
                 otp_verify_service.done(serializer.data['otp'])
-                return Response({"message": "otp verify success"}, status=status.HTTP_200_OK)
+                return Response({"messages": "otp verify success"}, status=status.HTTP_200_OK)
             except OtpVerifyError as e:
-                return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"messages": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class OtpView(APIView):
