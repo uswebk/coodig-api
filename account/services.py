@@ -72,6 +72,7 @@ class OtpVerifyService:
 
     def verify_done(self) -> None:
         self.account.email_verified_at = timezone.now()
+        self.account.last_login = timezone.now()
         self.account.save()
 
 
