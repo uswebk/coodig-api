@@ -39,7 +39,7 @@ class UserLoginView(APIView):
             token = login_service.login()
             return Response({'token': token, 'message': 'Login Success'}, status=status.HTTP_200_OK)
         except LoginError as e:
-            return Response({'errors': {'non_field_errors': ['Email or Password is not Valid']}},
+            return Response({'non_field_errors': ['Email or Password is not Valid']},
                             status=status.HTTP_404_NOT_FOUND)
 
 
