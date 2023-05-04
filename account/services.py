@@ -92,16 +92,13 @@ class SendResetPasswordService:
         uid = urlsafe_base64_encode(force_bytes(self.account.id))
         token = PasswordResetTokenGenerator().make_token(self.account)
         link = settings.APP_SCHEMA + 'reset-password/' + uid + '/' + token
-
-        expiration = now() + timedelta(hours=1)
+        expiration = now() + timedelta(seconds=settings.PASSWORD_RESET_TIMEOUT_SECONDS)
         payload = link + f':{expiration.timestamp()}'
-
         signature = hmac.new(
             key=settings.URI_SECRET_KEY.encode(),
             msg=payload.encode(),
             digestmod=hashlib.sha256
         ).hexdigest()
-
         url = f'{link}:{expiration.timestamp()}:{signature}'
 
         send_reset_password(self.account.email, url)
