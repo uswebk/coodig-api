@@ -5,9 +5,10 @@ import random
 
 from django.contrib.auth import authenticate
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.core.exceptions import ValidationError
 from django.utils import timezone
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes, smart_str
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.timezone import now, timedelta
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -102,3 +103,16 @@ class SendResetPasswordService:
         url = f'{link}:{expiration.timestamp()}:{signature}'
 
         send_reset_password(self.account.email, url)
+
+
+class ResetPasswordService:
+    @staticmethod
+    def execute(uid: str, token: str, password: str) -> None:
+        account_id = smart_str(urlsafe_base64_decode(uid))
+        account = Account.objects.get(id=account_id)
+
+        if not PasswordResetTokenGenerator().check_token(account, token):
+            raise ValidationError('Token is Valid or Expired')
+
+        account.set_password(password)
+        account.save()

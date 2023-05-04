@@ -1,18 +1,17 @@
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.utils.encoding import smart_str
-from django.utils.http import urlsafe_base64_decode
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from account.api.serializers import AccountRegistrationSerializer, VerifyAccountSerializer, UserLoginSerializer, \
+    AccountSerializer, OtpSerializer, SendPasswordResetEmailSerializer, PasswordResetSerializer
 from account.emails import send_opt
 from account.exceptions import OtpVerifyError, LoginError
 from account.models import Account
 from account.permissions import ActiveAccount
-from account.api.serializers import AccountRegistrationSerializer, VerifyAccountSerializer, UserLoginSerializer, \
-    AccountSerializer, OtpSerializer, SendPasswordResetEmailSerializer, PasswordResetSerializer
-from account.services import LoginService, OtpService, OtpVerifyService, get_tokens_for_user, SendResetPasswordService
+from account.services import LoginService, OtpService, OtpVerifyService, get_tokens_for_user, SendResetPasswordService, \
+    ResetPasswordService
 
 
 class RegistrationView(APIView):
@@ -118,12 +117,13 @@ class ResetPasswordView(APIView):
         serializer = self.serializers_class(data=request.data)
 
         if serializer.is_valid(raise_exception=True):
-            account_id = smart_str(urlsafe_base64_decode(serializer.data['uid']))
-            account = Account.objects.get(id=account_id)
+            try:
+                ResetPasswordService.execute(
+                    serializer.data['uid'],
+                    serializer.data['token'],
+                    serializer.data['password']
+                )
+                return Response({}, status=status.HTTP_200_OK)
 
-            if not PasswordResetTokenGenerator().check_token(account, serializer.data['token']):
-                return Response({'message': 'Token is Valid or Expired'}, status=status.HTTP_400_BAD_REQUEST)
-
-            account.set_password(serializer.data['password'])
-            account.save()
-            return Response({}, status=status.HTTP_200_OK)
+            except ValidationError as e:
+                return Response({'message': str(e.messages[0])}, status=status.HTTP_400_BAD_REQUEST)
