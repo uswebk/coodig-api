@@ -63,3 +63,22 @@ class SendPasswordResetEmailSerializer(serializers.Serializer):
 
     class Meta:
         fields = ['email']
+
+
+class PasswordResetSerializer(serializers.Serializer):
+    password = serializers.CharField(max_length=255, style={'input_type': 'password'})
+    password2 = serializers.CharField(max_length=255, style={'input_type': 'password'}, write_only=True)
+    uid = serializers.CharField()
+    token = serializers.CharField()
+
+    class Meta:
+        fields = ['password', 'password2', 'uid']
+
+    def validate(self, attrs):
+        password = attrs.get('password')
+        password2 = attrs.get('password2')
+        if password != password2:
+            raise serializers.ValidationError("Password and Confirm Password doesn't match")
+        if len(password) < 6:
+            raise serializers.ValidationError("Password six more")
+        return attrs
