@@ -27,8 +27,6 @@ class LoginService:
     def login(self) -> dict:
         account = authenticate(email=self.email, password=self.password)
         if account is not None:
-            if account.email_verified_at is None:
-                raise LoginError()
             account.last_login = timezone.now()
             account.save()
             return get_tokens_for_user(account)

@@ -126,4 +126,4 @@ class ResetPasswordView(APIView):
                 return Response({}, status=status.HTTP_200_OK)
 
             except ValidationError as e:
-                return Response({'message': str(e.messages[0])}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': {e.messages[0]}}, status=status.HTTP_400_BAD_REQUEST)
