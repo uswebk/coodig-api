@@ -23,8 +23,7 @@ class RegistrationView(APIView):
             serializer = self.serializer_class(data=request.data)
             serializer.is_valid(raise_exception=True)
             account = serializer.save()
-            otp_service = OtpService(account)
-            otp = otp_service.create()
+            otp = OtpService().create(account)
             send_opt(otp)
         return Response({'token': get_tokens_for_user(account)}, status=status.HTTP_201_CREATED)
 
@@ -37,8 +36,7 @@ class UserLoginView(APIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         try:
-            login_service = LoginService(serializer.data['email'], serializer.data['password'])
-            token = login_service.login()
+            token = LoginService().login(serializer.data['email'], serializer.data['password'])
             return Response({'token': token, 'message': 'Login Success'}, status=status.HTTP_200_OK)
         except LoginError as e:
             return Response({'non_field_errors': ['Email or Password is not Valid']},
@@ -54,8 +52,7 @@ class VerifyOtpView(APIView):
         account = self.request.user
         if serializer.is_valid(raise_exception=True):
             try:
-                otp_verify_service = OtpVerifyService(account)
-                otp_verify_service.done(serializer.data['otp'])
+                OtpVerifyService().done(account, serializer.data['otp'])
                 return Response({"messages": "otp verify success"}, status=status.HTTP_200_OK)
             except OtpVerifyError as e:
                 return Response({"messages": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -79,8 +76,7 @@ class SendOtpView(APIView):
 
     def post(self, request):
         account = self.request.user
-        otp_service = OtpService(account)
-        otp = otp_service.create()
+        otp = OtpService().create(account)
         send_opt(otp)
         return Response({'message': 'Send otp success'}, status=status.HTTP_200_OK)
 
@@ -102,9 +98,8 @@ class SendResetPasswordView(APIView):
 
         if serializer.is_valid(raise_exception=True):
             account = Account.objects.filter(email=serializer.data['email']).first()
-            if account is None:
-                return Response({'message': 'Send Reset Password Mail Fail'}, status=status.HTTP_404_NOT_FOUND)
-            SendResetPasswordService(account).execute()
+            if account is not None:
+                SendResetPasswordService().execute(account)
 
             return Response({'message': 'Send Reset Password Mail'}, status=status.HTTP_200_OK)
 

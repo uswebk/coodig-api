@@ -20,12 +20,9 @@ from coodig import settings
 
 
 class LoginService:
-    def __init__(self, email: str, password: str):
-        self.email = email
-        self.password = password
 
-    def login(self) -> dict:
-        account = authenticate(email=self.email, password=self.password)
+    def login(self, email: str, password: str) -> dict:
+        account = authenticate(email=email, password=password)
         if account is not None:
             account.last_login = timezone.now()
             account.save()
@@ -35,16 +32,15 @@ class LoginService:
 
 
 class OtpService:
-    def __init__(self, account: Account):
-        self.account = account
+    def __init__(self):
         self.number_of_digits = OTP_CODE_NUMBER_OF_DIGITS
 
-    def create(self) -> Otp:
+    def create(self, account: Account) -> Otp:
         digits = self.__get_digits()
         otp = Otp.objects.create(
             code=str(random.randrange(0, digits)).zfill(self.number_of_digits),
             expiration_at=timezone.now() + datetime.timedelta(minutes=OTP_VALID_MINUTES),
-            account_id=self.account.id
+            account_id=account.id
         )
         return otp
 
@@ -56,23 +52,20 @@ class OtpService:
 
 
 class OtpVerifyService:
-    def __init__(self, account: Account):
-        self.account = account
-
-    def done(self, send_code: str):
-        if not self.account.otps:
+    def done(self, account: Account, send_code: str):
+        if not account.otps:
             raise OtpVerifyError('Invalid otp verify')
-        otp = self.account.otps.last()
+        otp = account.otps.last()
         if send_code != otp.code:
             raise OtpVerifyError('Wrong otp code')
         if timezone.now() > otp.expiration_at:
             raise OtpVerifyError('Expiration of validity')
-        self.verify_done()
+        self.verify_done(account)
 
-    def verify_done(self) -> None:
-        self.account.email_verified_at = timezone.now()
-        self.account.last_login = timezone.now()
-        self.account.save()
+    def verify_done(self, account: Account) -> None:
+        account.email_verified_at = timezone.now()
+        account.last_login = timezone.now()
+        account.save()
 
 
 def get_tokens_for_user(user) -> dict:
@@ -84,12 +77,10 @@ def get_tokens_for_user(user) -> dict:
 
 
 class SendResetPasswordService:
-    def __init__(self, account: Account):
-        self.account = account
 
-    def execute(self) -> None:
-        uid = urlsafe_base64_encode(force_bytes(self.account.id))
-        token = PasswordResetTokenGenerator().make_token(self.account)
+    def execute(self, account: Account) -> None:
+        uid = urlsafe_base64_encode(force_bytes(account.id))
+        token = PasswordResetTokenGenerator().make_token(account)
         link = settings.APP_SCHEMA + 'reset-password/' + uid + '/' + token
         expiration = now() + timedelta(seconds=settings.PASSWORD_RESET_TIMEOUT_SECONDS)
         payload = link + f':{expiration.timestamp()}'
@@ -100,12 +91,12 @@ class SendResetPasswordService:
         ).hexdigest()
         url = f'{link}:{expiration.timestamp()}:{signature}'
 
-        send_reset_password(self.account.email, url)
+        send_reset_password(account.email, url)
 
 
 class ResetPasswordService:
-    @staticmethod
-    def execute(uid: str, token: str, password: str) -> None:
+
+    def execute(self, uid: str, token: str, password: str) -> None:
         account_id = smart_str(urlsafe_base64_decode(uid))
         account = Account.objects.get(id=account_id)
 
