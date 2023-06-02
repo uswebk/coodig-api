@@ -96,7 +96,8 @@ class SendResetPasswordService:
 
 class ResetPasswordService:
 
-    def execute(self, uid: str, token: str, password: str) -> None:
+    @staticmethod
+    def execute(uid: str, token: str, password: str) -> None:
         account_id = smart_str(urlsafe_base64_decode(uid))
         account = Account.objects.get(id=account_id)
 
