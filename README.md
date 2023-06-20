@@ -2,67 +2,67 @@
 
 Backend of quiz application for engineers🧑‍💻
 
-Frontend(Mobile): https://github.com/uswebk/coodig-mobile
+Frontend Code: https://github.com/uswebk/coodig-mobile
 
 ---
 
 ### Endpoints
 
-* Register account
+* **Register account**
 
 ```
 POST: /api/v1/accounts/register/
 ```
 
-* Login
+* **Login**
 
 ```
 POST: /api/v1/accounts/login/
 ```
 
-* Refresh JWT
+* **Refresh JWT**
 
 ```
 POST: /api/token/refresh/
 ```
 
-* Verify JWT
+* **Verify JWT**
 
 ```
 POST: /api/token/verify/
 ```
 
-* Fetch User
+* **Fetch Me**
 
 ```
 GET: /api/v1/accounts/me/
 ```
 
-* Send OTP
+* **Send OTP**
 
 ```
 POST: /api/v1/accounts/otp/send/
 ```
 
-* Verify OTP
+* **Verify OTP**
 
 ```
 POST: /api/v1/accounts/otp/verify/
 ```
 
-* Fetch OTP
+* **Fetch OTP**
 
 ```
 GET: /api/v1/accounts/otp/
 ```
 
-* Send Reset Password Email
+* **Send Reset Password Email**
 
 ```
 POST: /api/v1/accounts/reset-password/send/
 ```
 
-* Reset Password
+* **Reset Password**
 
 ```
 POST: /api/v1/accounts/reset-password/
