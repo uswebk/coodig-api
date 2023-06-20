@@ -99,7 +99,7 @@ class SendResetPasswordView(APIView):
         if serializer.is_valid(raise_exception=True):
             account = Account.objects.filter(email=serializer.data['email']).first()
             if account is not None:
-                SendResetPasswordService().execute(account)
+                SendResetPasswordService.execute(account)
 
             return Response({'message': 'Send Reset Password Mail'}, status=status.HTTP_200_OK)
 

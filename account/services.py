@@ -78,7 +78,8 @@ def get_tokens_for_user(user) -> dict:
 
 class SendResetPasswordService:
 
-    def execute(self, account: Account) -> None:
+    @staticmethod
+    def execute(account: Account) -> None:
         uid = urlsafe_base64_encode(force_bytes(account.id))
         token = PasswordResetTokenGenerator().make_token(account)
         link = settings.APP_SCHEMA + 'reset-password/' + uid + '/' + token
