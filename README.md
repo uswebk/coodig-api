@@ -1,15 +1,13 @@
-# coodig
-
 <div align="center"> 
-<img width="250" alt="coodig-icon" src="https://github.com/uswebk/coodig-mobile/assets/50518919/4f473d5e-a722-41ac-a018-b080f05a10e3">
-</div> 
+<img width="350" alt="coodig-icon" src="https://github.com/uswebk/coodig-api/assets/50518919/825c5f98-bf93-4861-a614-1e7f176b1a44">
+<h1>coodig</h1>
+
+<h4>Backend（API） of quiz application for engineers🧑‍💻</h4>
+</div>
 
 ---
-Backend of quiz application for engineers🧑‍💻
 
-Frontend Code: https://github.com/uswebk/coodig-mobile
-
----
+📱 Mobile: https://github.com/uswebk/coodig-mobile
 
 ### Endpoints
 
