@@ -9,6 +9,11 @@
 
 📱 Mobile: https://github.com/uswebk/coodig-mobile
 
+## Run App
+```
+python3 manage.py runserver 0.0.0.0:9999
+```
+
 ### Endpoints
 
 * **Register account**
