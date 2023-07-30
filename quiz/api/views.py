@@ -55,8 +55,9 @@ class QuizViewSet(ModelViewSet):
 
     @action(methods=['GET'], detail=False)
     def random(self, request, pk=None):
-        quiz = RandomQuizServie().get_random(self.request.user)
+        limit = int(request.GET.get('limit')) if request.GET.get('limit') is not None else 10
+        quiz = RandomQuizServie().get_random(self.request.user, limit)
 
         if not quiz:
             raise Http404
-        return Response(self.serializer_class(quiz).data, status=status.HTTP_200_OK)
+        return Response(self.serializer_class(quiz, many=True).data, status=status.HTTP_200_OK)
