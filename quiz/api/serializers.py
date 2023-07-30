@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
+from account.api.serializers import AccountSerializer
 from quiz.models import Tag, Quiz, QuizChoice, QuizTag, QuizAnswer, QuizAnswerChoice
 
 
@@ -16,6 +17,7 @@ class QuizSerializer(serializers.ModelSerializer):
     is_deleted = serializers.BooleanField()
     choices = SerializerMethodField()
     tags = serializers.SerializerMethodField()
+    created_by = serializers.SerializerMethodField()
 
     class Meta:
         model = Quiz
@@ -29,6 +31,12 @@ class QuizSerializer(serializers.ModelSerializer):
     def get_tags(obj):
         quiz = Quiz.objects.get(pk=obj.pk)
         serializer = TagSerializer(quiz.tags.all(), many=True)
+        return serializer.data
+
+    @staticmethod
+    def get_created_by(obj):
+        quiz = Quiz.objects.get(pk=obj.pk)
+        serializer = AccountSerializer(quiz.created_by)
         return serializer.data
 
 
