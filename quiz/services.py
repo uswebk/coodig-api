@@ -60,7 +60,7 @@ class AnswerService:
 
 class RandomQuizServie:
     @staticmethod
-    def get_random(account: Account):
+    def get_random(account: Account, limit: int):
         subquery = Subquery(
             QuizAnswer.objects.filter(quiz_id=OuterRef('pk')).filter(account_id=account.id).values('quiz_id')
         )
@@ -69,4 +69,4 @@ class RandomQuizServie:
             has_children=Exists(subquery)
         ).filter(
             has_children=False
-        ).first()
+        )[:limit]
