@@ -47,7 +47,7 @@ class AnswerService:
 
         payload = []
         for choice in quiz_choices:
-            is_select = choice.sort in choices
+            is_select = choice.id in choices
             payload.append(QuizAnswerChoice(
                 answer_id=answer,
                 choice=choice.sentence,
