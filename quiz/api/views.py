@@ -2,12 +2,12 @@ from django.db import transaction
 from django.http import Http404
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.generics import get_object_or_404
+from rest_framework.generics import get_object_or_404, ListAPIView
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from quiz.models import Tag, Quiz
-from quiz.api.serializers import TagSerializer, QuizSerializer
+from quiz.models import Tag, Quiz, QuizAnswer
+from quiz.api.serializers import TagSerializer, QuizSerializer, QuizAnswerSerializer
 from quiz.services import AnswerService, QuizService, RandomQuizServie
 
 
@@ -47,6 +47,7 @@ class QuizViewSet(ModelViewSet):
     @action(methods=['POST'], detail=True)
     def answer(self, request, pk=None):
         quiz = get_object_or_404(Quiz.objects.prefetch_related('choices'), pk=pk)
+
         answer_service = AnswerService(quiz, self.request.user)
         answer_serializer = answer_service.create_answer(request.data['is_correct'])
         answer_service.create_answer_choices(quiz, request.data['choices'])
@@ -61,3 +62,11 @@ class QuizViewSet(ModelViewSet):
         if not quiz:
             raise Http404
         return Response(self.serializer_class(quiz, many=True).data, status=status.HTTP_200_OK)
+
+
+class AnswerView(ListAPIView):
+    serializer_class = QuizAnswerSerializer
+
+    def get_queryset(self):
+        account = self.request.user
+        return QuizAnswer.objects.filter(account_id=account.id)
