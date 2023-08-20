@@ -1,4 +1,5 @@
 from django.db.models import Count, Subquery, Exists, OuterRef
+from django.db.models.functions import Random
 
 from account.models import Account
 from quiz.models import Quiz, Tag, QuizAnswerChoice, QuizAnswer
@@ -65,8 +66,10 @@ class RandomQuizServie:
             QuizAnswer.objects.filter(quiz_id=OuterRef('pk')).filter(account_id=account.id).values('quiz_id')
         )
 
-        return Quiz.objects.exclude(created_by=account).filter(is_published=True).annotate(
+        return Quiz.objects.annotate(random_number=Random()).exclude(created_by=account).filter(
+            is_published=True
+        ).annotate(
             has_children=Exists(subquery)
         ).filter(
             has_children=False
-        )[:limit]
+        ).order_by('random_number')[:limit]

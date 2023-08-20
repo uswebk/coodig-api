@@ -16,7 +16,7 @@ DEBUG = env('DEBUG')
 if env('DEBUG'):
     APP_SCHEMA = 'dev.coodig://'
 
-ALLOWED_HOSTS = ['10.0.2.2', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
