@@ -1,5 +1,5 @@
 <div align="center"> 
-<img width="350" alt="coodig-icon" src="https://github.com/uswebk/coodig-api/assets/50518919/825c5f98-bf93-4861-a614-1e7f176b1a44">
+<img alt="coodig-icon" src="https://github.com/uswebk/coodig-api/assets/50518919/098489db-fce3-4bbb-a020-fe969fdf20f2">
 <h1>coodig</h1>
 
 <h4>Backend（API） of quiz application for engineers🧑‍💻</h4>
@@ -9,12 +9,12 @@
 
 📱 Mobile: https://github.com/uswebk/coodig-mobile
 
-## Run App
+## Run App 🚗
 ```
 python3 manage.py runserver 0.0.0.0:9999
 ```
 
-### Endpoints
+## Endpoints
 
 * **Register account**
 
