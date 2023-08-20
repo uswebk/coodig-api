@@ -55,7 +55,7 @@ class QuizAnswer(models.Model):
     quiz_id = models.ForeignKey(Quiz, related_name='answer_quiz', db_column='quiz_id', on_delete=models.CASCADE)
     question = models.TextField()
     is_correct = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
