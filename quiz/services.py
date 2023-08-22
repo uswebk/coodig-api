@@ -65,9 +65,9 @@ class RandomQuizServie:
         subquery = Subquery(
             QuizAnswer.objects.filter(quiz_id=OuterRef('pk')).filter(account_id=account.id).values('quiz_id')
         )
-
         return Quiz.objects.annotate(random_number=Random()).exclude(created_by=account).filter(
-            is_published=True
+            is_published=True,
+            choices__is_answer=True
         ).annotate(
             has_children=Exists(subquery)
         ).filter(
