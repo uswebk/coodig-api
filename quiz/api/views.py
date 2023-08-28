@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.db.models import Count, Sum
 from django.http import Http404
 from rest_framework import status
 from rest_framework.decorators import action
@@ -48,6 +49,8 @@ class QuizViewSet(ModelViewSet):
     def answer(self, request, pk=None):
         quiz = get_object_or_404(Quiz.objects.prefetch_related('choices'), pk=pk)
 
+        # TODO: check already answered
+
         answer_service = AnswerService(quiz, self.request.user)
         answer_serializer = answer_service.create_answer(request.data['is_correct'])
         answer_service.create_answer_choices(quiz, request.data['choices'])
@@ -57,16 +60,36 @@ class QuizViewSet(ModelViewSet):
     @action(methods=['GET'], detail=False)
     def random(self, request, pk=None):
         limit = int(request.GET.get('limit')) if request.GET.get('limit') is not None else 10
-        quiz = RandomQuizServie().get_random(self.request.user, limit)
+        quiz = RandomQuizServie.get_random(self.request.user, limit)
 
         if not quiz:
             raise Http404
         return Response(self.serializer_class(quiz, many=True).data, status=status.HTTP_200_OK)
 
 
-class AnswerView(ListAPIView):
+class AnswerViewSet(ModelViewSet):
     serializer_class = QuizAnswerSerializer
 
     def get_queryset(self):
         account = self.request.user
-        return QuizAnswer.objects.filter(account_id=account.id)
+        queryset = QuizAnswer.objects.filter(account_id=account.id).prefetch_related('answer_choices')
+
+        start_date = self.request.query_params.get('start_date')
+        if start_date:
+            queryset = queryset.filter(created_at__gte=start_date)
+
+        end_date = self.request.query_params.get('end_date')
+        if end_date:
+            queryset = queryset.filter(created_at__lte=end_date)
+
+        return queryset
+
+    @action(methods=['GET'], detail=False)
+    def stats(self, request):
+        account = self.request.user
+        result = QuizAnswer.objects.filter(account_id=account).values('account_id').annotate(
+            quiz_count=Count('id'),
+            correct_count=Sum('is_correct')
+        )
+
+        return Response(result)
