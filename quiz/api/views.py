@@ -1,5 +1,7 @@
+import datetime
+
 from django.db import transaction
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, Q
 from django.http import Http404
 from rest_framework import status
 from rest_framework.decorators import action
@@ -58,7 +60,7 @@ class QuizViewSet(ModelViewSet):
         return Response(answer_serializer.data, status=status.HTTP_201_CREATED)
 
     @action(methods=['GET'], detail=False)
-    def random(self, request, pk=None):
+    def random(self, request):
         limit = int(request.GET.get('limit')) if request.GET.get('limit') is not None else 10
         quiz = RandomQuizServie.get_random(self.request.user, limit)
 
@@ -86,10 +88,15 @@ class AnswerViewSet(ModelViewSet):
 
     @action(methods=['GET'], detail=False)
     def stats(self, request):
+        now = datetime.datetime.now(datetime.timezone.utc)
         account = self.request.user
-        result = QuizAnswer.objects.filter(account_id=account).values('account_id').annotate(
+        result = QuizAnswer.objects.filter(account_id=account).values('account_id').aggregate(
             quiz_count=Count('id'),
-            correct_count=Sum('is_correct')
+            correct_count=Count('id', filter=Q(is_correct=True)),
+            today_answer_count=Count('id', filter=Q(created_at__date=now)),
+            today_correct_count=Count('id', filter=Q(created_at__date=now, is_correct=True)),
         )
+        quiz_count = Quiz.objects.filter(is_published=True, is_deleted=False).aggregate(count=Count('id'))
+        result['total'] = quiz_count['count']
 
         return Response(result)
