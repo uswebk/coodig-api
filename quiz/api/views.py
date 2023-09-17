@@ -9,7 +9,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from quiz.models import Tag, Quiz, QuizAnswer
+from quiz.models import Tag, Quiz, QuizAnswer, QuizAnswerChoice
 from quiz.api.serializers import TagSerializer, QuizSerializer, QuizAnswerSerializer
 from quiz.services import AnswerService, QuizService, RandomQuizServie
 
@@ -53,11 +53,31 @@ class QuizViewSet(ModelViewSet):
 
         # TODO: check already answered
 
-        answer_service = AnswerService(quiz, self.request.user)
-        answer_serializer = answer_service.create_answer(request.data['is_correct'])
-        answer_service.create_answer_choices(quiz, request.data['choices'])
+        # TODO: Create Serializer
+        answer = {
+            'account_id': self.request.user.id,
+            'quiz_id': quiz.id,
+            'question': quiz.question,
+            'is_correct': request.data['is_correct'],
+        }
+        serializer = QuizAnswerSerializer(data=answer)
+        serializer.is_valid(raise_exception=True)
+        answer = serializer.save()
 
-        return Response(answer_serializer.data, status=status.HTTP_201_CREATED)
+        quiz_choices = quiz.choices.all()
+        payload = []
+        for choice in quiz_choices:
+            is_select = choice.id in request.data['choices']
+            payload.append(QuizAnswerChoice(
+                answer_id=answer,
+                choice=choice.sentence,
+                is_answer=choice.is_answer,
+                is_select=is_select,
+            ))
+
+        QuizAnswerChoice.objects.bulk_create(payload)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(methods=['GET'], detail=False)
     def random(self, request):
