@@ -11,7 +11,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from quiz.models import Tag, Quiz, QuizAnswer, QuizAnswerChoice
 from quiz.api.serializers import TagSerializer, QuizSerializer, QuizAnswerSerializer
-from quiz.services import AnswerService, QuizService, RandomQuizServie
+from quiz.services import QuizService, RandomQuizServie
 
 
 class TagViewSet(ModelViewSet):
