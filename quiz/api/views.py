@@ -50,32 +50,28 @@ class QuizViewSet(ModelViewSet):
     @action(methods=['POST'], detail=True)
     def answer(self, request, pk=None):
         quiz = get_object_or_404(Quiz.objects.prefetch_related('choices'), pk=pk)
+        quiz_choices = quiz.choices.all()
 
-        # TODO: check already answered
+        choices = []
+        for choice in quiz_choices:
+            is_select = choice.id in request.data['choices']
+            choice = {
+                'choice': choice.sentence,
+                'is_answer': choice.is_answer,
+                'is_select': is_select,
+            }
+            choices.append(choice)
 
-        # TODO: Create Serializer
-        answer = {
+        payload = {
             'account_id': self.request.user.id,
             'quiz_id': quiz.id,
             'question': quiz.question,
             'is_correct': request.data['is_correct'],
+            'answer_choices': choices
         }
-        serializer = QuizAnswerSerializer(data=answer)
+        serializer = QuizAnswerSerializer(data=payload)
         serializer.is_valid(raise_exception=True)
-        answer = serializer.save()
-
-        quiz_choices = quiz.choices.all()
-        payload = []
-        for choice in quiz_choices:
-            is_select = choice.id in request.data['choices']
-            payload.append(QuizAnswerChoice(
-                answer_id=answer,
-                choice=choice.sentence,
-                is_answer=choice.is_answer,
-                is_select=is_select,
-            ))
-
-        QuizAnswerChoice.objects.bulk_create(payload)
+        serializer.save()
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 

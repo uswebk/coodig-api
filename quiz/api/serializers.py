@@ -50,19 +50,24 @@ class QuizChoiceSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class QuizAnswerChoiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuizAnswerChoice
+        fields = '__all__'
+        read_only_fields = ('answer_id',)
+
+
 class QuizAnswerSerializer(serializers.ModelSerializer):
-    answer_choices = SerializerMethodField()
+    answer_choices = QuizAnswerChoiceSerializer(many=True)
 
     class Meta:
         model = QuizAnswer
         fields = '__all__'
 
-    @staticmethod
-    def get_answer_choices(obj):
-        return QuizAnswerChoiceSerializer(QuizAnswerChoice.objects.filter(answer_id=obj.id).all(), many=True).data
+    def create(self, validated_data):
+        answer_choices_data = validated_data.pop('answer_choices', [])
+        quiz_answer = QuizAnswer.objects.create(**validated_data)
+        payload = [QuizAnswerChoice(answer_id=quiz_answer, **choice_data) for choice_data in answer_choices_data]
+        QuizAnswerChoice.objects.bulk_create(payload)
 
-
-class QuizAnswerChoiceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = QuizAnswerChoice
-        fields = '__all__'
+        return quiz_answer
