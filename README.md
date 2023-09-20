@@ -1,5 +1,5 @@
 <div align="center"> 
-<img alt="coodig-icon" src="https://github.com/uswebk/coodig-api/assets/50518919/098489db-fce3-4bbb-a020-fe969fdf20f2">
+<img  width="350" alt="coodig-icon" src="https://github.com/uswebk/coodig-api/assets/50518919/5e0a9c1c-ddf8-4835-ad7c-fffef407bc85">
 <h1>coodig</h1>
 
 <h4>Backend（API） of quiz application for engineers🧑‍💻</h4>
