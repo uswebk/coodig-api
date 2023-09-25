@@ -1,6 +1,5 @@
 import datetime
 
-from django.db import transaction
 from django.db.models import Count, Q
 from django.http import Http404
 from rest_framework import status
@@ -11,7 +10,6 @@ from rest_framework.viewsets import ModelViewSet
 
 from quiz.models import Tag, Quiz, QuizAnswer
 from quiz.api.serializers import TagSerializer, QuizSerializer, QuizAnswerSerializer
-from quiz.services import QuizService, RandomQuizServie
 
 
 class TagViewSet(ModelViewSet):
@@ -30,8 +28,6 @@ class QuizViewSet(ModelViewSet):
     @action(methods=['GET'], detail=False)
     def random(self, request):
         limit = int(request.GET.get('limit')) if request.GET.get('limit') is not None else 10
-        quiz = RandomQuizServie.get_random(self.request.user, limit)
-
         quiz = self.queryset.random(self.request.user, limit)
 
         if not quiz:
