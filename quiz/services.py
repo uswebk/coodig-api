@@ -1,9 +1,9 @@
-from django.db.models import Count, Subquery, Exists, OuterRef
+from django.db.models import Subquery, Exists, OuterRef
 from django.db.models.functions import Random
 
 from account.models import Account
-from quiz.models import Quiz, Tag, QuizAnswerChoice, QuizAnswer
-from quiz.api.serializers import QuizAnswerSerializer, QuizChoiceSerializer
+from quiz.models import Quiz, Tag, QuizAnswer
+from quiz.api.serializers import QuizChoiceSerializer
 
 
 class QuizService:
