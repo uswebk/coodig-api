@@ -12,9 +12,11 @@ from account.models import Account
 from account.permissions import ActiveAccount
 from account.services import LoginService, OtpService, OtpVerifyService, get_tokens_for_user, SendResetPasswordService, \
     ResetPasswordService
+from rest_framework.authentication import BasicAuthentication
 
 
 class RegistrationView(APIView):
+    authentication_classes = []
     permission_classes = [permissions.AllowAny, ]
     serializer_class = AccountRegistrationSerializer
 
