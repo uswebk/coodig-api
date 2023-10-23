@@ -1,6 +1,7 @@
 from django.db import models
 
 from account.models import Account
+from quiz.managers import QuizManager
 
 
 class Tag(models.Model):
@@ -22,6 +23,8 @@ class Quiz(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     tags = models.ManyToManyField(Tag, through='QuizTag', blank=True)
+
+    objects = QuizManager()
 
     class Meta:
         db_table = 'quizzes'
